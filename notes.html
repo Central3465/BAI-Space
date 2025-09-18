@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BAI Space</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      /* Login box */
+      button:disabled {
+        background-color: gray;
+        cursor: not-allowed;
+      }
+
+      #login {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+      }
+
+      #login-box {
+        background: #fff;
+        padding: 30px 40px;
+        border: 2px solid #4a90e2;
+        border-radius: 15px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        text-align: center;
+        max-width: 400px;
+        width: 100%;
+      }
+
+      #login-box h2 {
+        margin-bottom: 15px;
+        color: #222;
+      }
+
+      #login-box p {
+        margin-bottom: 20px;
+        font-size: 0.95rem;
+        color: #555;
+      }
+
+      #login-box input {
+        width: 100%;
+        padding: 10px;
+        margin: 8px 0;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 1rem;
+      }
+
+      #login-box button {
+        width: 100%;
+        margin-top: 10px;
+      }
+
+      #content {
+        display: none; /* Hide content until login */
+        padding: 20px;
+      }
+
+      #error {
+        color: red;
+        display: none;
+      }
+
+      /* Notes section styling */
+      #notes {
+        margin-top: 30px;
+        padding: 20px;
+        background: #f9f9f9;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        max-width: 600px;
+      }
+
+      #notes h2 {
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+        color: #333;
+        text-align: center;
+      }
+
+      /* Input area */
+      #noteInput {
+        width: 100%;
+        min-height: 100px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 10px;
+        font-size: 1rem;
+        font-family: "Segoe UI", Tahoma, sans-serif;
+        resize: vertical;
+        box-sizing: border-box;
+      }
+
+      /* Buttons */
+      #notes button {
+        margin-top: 10px;
+        margin-right: 10px;
+        padding: 8px 14px;
+        border: none;
+        border-radius: 6px;
+        background: #4a90e2;
+        color: white;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+
+      #notes button:hover {
+        background: #357abd;
+      }
+
+      #notes button:disabled {
+        background: gray;
+        cursor: not-allowed;
+      }
+
+      /* Notes list */
+      #notesList {
+        margin-top: 20px;
+        list-style: none;
+        padding: 0;
+      }
+
+      #notesList li {
+        background: #fffbe6;
+        border: 1px solid #f0e68c;
+        border-radius: 8px;
+        padding: 10px 14px;
+        margin-bottom: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      /* Delete button inside notes */
+      #notesList li button {
+        background: #ff4d4d;
+        color: white;
+        border: none;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+
+      #notesList li button:hover {
+        background: #cc0000;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="login">
+      <div id="login-box">
+        <h2>Enter Access Code</h2>
+        <p>
+          Access is heavily restricted. To get access, you must obtain the code
+          from the website operator.
+        </p>
+        <input type="password" id="passwordInput" placeholder="Access code" />
+        <br />
+        <button id="submitBtn" onclick="authenticate()">Submit</button>
+        <p id="error" style="color: red; display: none"></p>
+      </div>
+    </div>
+
+    <div id="content" style="display: none">
+      <header>
+        <h1>Welcome to BAI Space</h1>
+        <p id="motivation">Your personal hub</p>
+      </header>
+      <nav>
+        <ul>
+          <li><a href="notes.html">Notes</a></li>
+          <li><a href="notes/">Quick Links</a></li>
+          <li><a href="projects/">Focus Timer</a></li>
+          <li><a href="music/">To-Do Tasks</a></li>
+        </ul>
+      </nav>
+      <main>
+        <section>
+          <h2>Notes</h2>
+          <p>Write your most important notes here, so that you don't forget!</p>
+        </section>
+      </main>
+
+      <!-- Notes live here so they stay hidden until login -->
+      <section id="notes">
+        <h2>Notes</h2>
+        <textarea
+          id="noteInput"
+          placeholder="Write your note here..."
+        ></textarea>
+        <br />
+        <button onclick="saveNote()">Save Note</button>
+        <button onclick="clearNotes()">Clear All Notes</button>
+        <ul id="notesList"></ul>
+      </section>
+    </div>
+
+    <script>
+      function saveNote() {
+        const input = document.getElementById("noteInput");
+        const note = input.value.trim();
+        if (note) {
+          let notes = JSON.parse(localStorage.getItem("notes")) || [];
+          notes.push(note);
+          localStorage.setItem("notes", JSON.stringify(notes));
+          input.value = "";
+          renderNotes();
+        }
+      }
+
+      function clearNotes() {
+        localStorage.removeItem("notes");
+        renderNotes();
+      }
+
+      function renderNotes() {
+        const notesList = document.getElementById("notesList");
+        notesList.innerHTML = "";
+        const notes = JSON.parse(localStorage.getItem("notes")) || [];
+        notes.forEach((note, index) => {
+          const li = document.createElement("li");
+          li.textContent = note;
+
+          // Delete button for each note
+          const delBtn = document.createElement("button");
+          delBtn.textContent = "❌";
+          delBtn.style.marginLeft = "10px";
+          delBtn.onclick = () => {
+            notes.splice(index, 1);
+            localStorage.setItem("notes", JSON.stringify(notes));
+            renderNotes();
+          };
+
+          li.appendChild(delBtn);
+          notesList.appendChild(li);
+        });
+      }
+
+      // Load notes on page load
+      renderNotes();
+    </script>
+
+    <script>
+      let attempts = 0;
+      const maxAttempts = 3;
+      const banTime = 3000; //10 * 60 * 1000; // 10 minutes in ms
+
+      // Add your motivational quotes here
+      const quotes = [
+        "Stay focused. Stay determined.",
+        "Small steps every day add up to big results.",
+        "Your only limit is your imagination.",
+        "Dream it. Do it.",
+        "Discipline beats motivation.",
+        "Don’t wish for it. Work for it.",
+        "Progress, not perfection.",
+      ];
+
+      function getRandomQuote() {
+        const index = Math.floor(Math.random() * quotes.length);
+        return quotes[index];
+      }
+
+      function authenticate() {
+        const now = Date.now();
+        const bannedUntil = localStorage.getItem("bannedUntil");
+        const errorEl = document.getElementById("error");
+        const submitBtn = document.getElementById("submitBtn");
+        const inputEl = document.getElementById("passwordInput");
+
+        // Always clear input after pressing submit
+        const input = inputEl.value;
+        inputEl.value = "";
+
+        if (bannedUntil && now < parseInt(bannedUntil)) {
+          const remaining = Math.ceil((parseInt(bannedUntil) - now) / 1000);
+          errorEl.textContent = `Too many wrong attempts. Try again in ${remaining} seconds.`;
+          errorEl.style.display = "block";
+          submitBtn.disabled = true;
+          return;
+        }
+
+        if (input === "HanlinSecret123") {
+          localStorage.removeItem("bannedUntil");
+          errorEl.style.display = "none";
+          document.getElementById("login").style.display = "none";
+          document.getElementById("content").style.display = "block";
+
+          // Replace the "Your personal hub" text with a random quote
+          document.getElementById("motivation").textContent = getRandomQuote();
+        } else {
+          attempts++;
+          errorEl.textContent = "Access denied!";
+          errorEl.style.display = "block";
+
+          if (attempts >= maxAttempts) {
+            localStorage.setItem("bannedUntil", now + banTime);
+            errorEl.textContent =
+              "Too many wrong attempts. You are banned for 10 minutes.";
+            submitBtn.disabled = true;
+            attempts = 0;
+          }
+        }
+      }
+    </script>
+  </body>
+</html>
