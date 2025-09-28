@@ -1,170 +1,211 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BAI Space</title>
-    <link rel="stylesheet" href="style.css" />
-    <style>
-      /* Login box */
-      button:disabled {
-        background-color: gray;
-        cursor: not-allowed;
-      }
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-rocket"></i>
+                <h1>BAI Space</h1>
+            </div>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <i class="fas fa-moon"></i>
+            </button>
+        </header>
+    </div>
 
-      #login {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100vh;
-      }
-
-      #login-box {
-        background: #fff;
-        padding: 30px 40px;
-        border: 2px solid #4a90e2;
-        border-radius: 15px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        text-align: center;
-        max-width: 400px;
-        width: 100%;
-      }
-
-      #login-box h2 {
-        margin-bottom: 15px;
-        color: #222;
-      }
-
-      #login-box p {
-        margin-bottom: 20px;
-        font-size: 0.95rem;
-        color: #555;
-      }
-
-      #login-box input {
-        width: 100%;
-        padding: 10px;
-        margin: 8px 0;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        font-size: 1rem;
-      }
-
-      #login-box button {
-        width: 100%;
-        margin-top: 10px;
-      }
-
-      #content {
-        display: none; /* Hide content until login */
-        padding: 20px;
-      }
-
-      #error {
-        color: red;
-        display: none;
-      }
-    </style>
-  </head>
-  <body>
     <div id="login">
-      <div id="login-box">
-        <h2>Enter Access Code</h2>
-        <p>
-          Access is heavily restricted. To get access, you must obtain the code
-          from the website operator.
-        </p>
-        <input type="password" id="passwordInput" placeholder="Access code" />
-        <br />
-        <button id="submitBtn" onclick="authenticate()">Submit</button>
-        <p id="error" style="color: red; display: none"></p>
-      </div>
+        <div class="login-bg"></div>
+        <div class="particles" id="particles"></div>
+        <div id="login-box">
+            <h2>Enter Access Code</h2>
+            <p>
+                Access is heavily restricted. To get access, you must obtain the code
+                from the website operator.
+            </p>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="passwordInput" placeholder="Access code" autocomplete="off">
+            </div>
+            <button class="btn" id="submitBtn" onclick="authenticate()">
+                <i class="fas fa-paper-plane"></i> Submit
+            </button>
+            <p id="error" style="display: none"></p>
+        </div>
     </div>
 
     <div id="content">
-      <header>
-        <h1>Welcome to BAI Space</h1>
-        <p id="motivation">Your personal hub</p>
-      </header>
-      <nav>
-        <ul>
-          <li><a href="notes.html">Notes</a></li>
-          <li><a href="notes/">Quick Links</a></li>
-          <li><a href="projects/">Focus Timer</a></li>
-          <li><a href="music/">To-Do Tasks</a></li>
-        </ul>
-      </nav>
-      <main>
-        <section>
-          <h2>Dashboard</h2>
-          <p>Choose a section from above to explore your private tools.</p>
-        </section>
-      </main>
+        <div class="container">
+            <div class="welcome-section">
+                <h1>Welcome to BAI Space</h1>
+                <p id="motivation">Your personal hub</p>
+            </div>
+            
+            <nav>
+                <ul>
+                    <li><a href="notes.html"><i class="fas fa-sticky-note"></i> Notes</a></li>
+                    <li><a href="notes/"><i class="fas fa-link"></i> Quick Links</a></li>
+                    <li><a href="projects/"><i class="fas fa-clock"></i> Focus Timer</a></li>
+                    <li><a href="music/"><i class="fas fa-tasks"></i> To-Do Tasks</a></li>
+                </ul>
+            </nav>
+            
+            <main>
+                <section>
+                    <h2>Dashboard</h2>
+                    <p>Choose a section from above to explore your private tools. This secure space is designed to help you focus, organize, and achieve your goals. Your productivity journey starts here.</p>
+                </section>
+            </main>
+        </div>
     </div>
 
     <script>
-      let attempts = 0;
-      const maxAttempts = 3;
-      const banTime = 3000; //10 * 60 * 1000; // 10 minutes in ms
+        // Create floating particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 30;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random size
+                const size = Math.random() * 10 + 2;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // Random position
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                
+                // Random animation duration
+                particle.style.animationDuration = `${Math.random() * 20 + 10}s`;
+                particle.style.animationDelay = `${Math.random() * 5}s`;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        
+        // Check for saved theme preference or respect OS preference
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+            body.classList.add('dark-mode');
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            
+            // Save preference to localStorage
+            if (body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+            } else {
+                localStorage.setItem('theme', 'light');
+            }
+        });
+        
+        // Authentication functionality
+        let attempts = 0;
+        const maxAttempts = 3;
+        const banTime = 3000; // 3 seconds for demo (10 minutes in original)
 
-      // Add your motivational quotes here
-      const quotes = [
-        "Stay focused. Stay determined.",
-        "Small steps every day add up to big results.",
-        "Your only limit is your imagination.",
-        "Dream it. Do it.",
-        "Discipline beats motivation.",
-        "Don’t wish for it. Work for it.",
-        "Progress, not perfection.",
-      ];
+        // Motivational quotes
+        const quotes = [
+            "Stay focused. Stay determined.",
+            "Small steps every day add up to big results.",
+            "Your only limit is your imagination.",
+            "Dream it. Do it.",
+            "Discipline beats motivation.",
+            "Don’t wish for it. Work for it.",
+            "Progress, not perfection.",
+            "The only impossible journey is the one you never begin.",
+            "Believe you can and you're halfway there.",
+            "Success is the sum of small efforts repeated day in and day out."
+        ];
 
-      function getRandomQuote() {
-        const index = Math.floor(Math.random() * quotes.length);
-        return quotes[index];
-      }
-
-      function authenticate() {
-        const now = Date.now();
-        const bannedUntil = localStorage.getItem("bannedUntil");
-        const errorEl = document.getElementById("error");
-        const submitBtn = document.getElementById("submitBtn");
-        const inputEl = document.getElementById("passwordInput");
-
-        // Always clear input after pressing submit
-        const input = inputEl.value;
-        inputEl.value = "";
-
-        if (bannedUntil && now < parseInt(bannedUntil)) {
-          const remaining = Math.ceil((parseInt(bannedUntil) - now) / 1000);
-          errorEl.textContent = `Too many wrong attempts. Try again in ${remaining} seconds.`;
-          errorEl.style.display = "block";
-          submitBtn.disabled = true;
-          return;
+        function getRandomQuote() {
+            const index = Math.floor(Math.random() * quotes.length);
+            return quotes[index];
         }
 
-        if (input === "HanlinSecret123") {
-          localStorage.removeItem("bannedUntil");
-          errorEl.style.display = "none";
-          document.getElementById("login").style.display = "none";
-          document.getElementById("content").style.display = "block";
+        function authenticate() {
+            const now = Date.now();
+            const bannedUntil = localStorage.getItem("bannedUntil");
+            const errorEl = document.getElementById("error");
+            const submitBtn = document.getElementById("submitBtn");
+            const inputEl = document.getElementById("passwordInput");
 
-          // Replace the "Your personal hub" text with a random quote
-          document.getElementById("motivation").textContent = getRandomQuote();
-        } else {
-          attempts++;
-          errorEl.textContent = "Access denied!";
-          errorEl.style.display = "block";
+            // Always clear input after pressing submit
+            const input = inputEl.value;
+            inputEl.value = "";
 
-          if (attempts >= maxAttempts) {
-            localStorage.setItem("bannedUntil", now + banTime);
-            errorEl.textContent =
-              "Too many wrong attempts. You are banned for 10 minutes.";
-            submitBtn.disabled = true;
-            attempts = 0;
-          }
+            if (bannedUntil && now < parseInt(bannedUntil)) {
+                const remaining = Math.ceil((parseInt(bannedUntil) - now) / 1000);
+                errorEl.textContent = `Too many wrong attempts. Try again in ${remaining} seconds.`;
+                errorEl.style.display = "block";
+                submitBtn.disabled = true;
+                return;
+            }
+
+            if (input === "HanlinSecret123") {
+                localStorage.removeItem("bannedUntil");
+                errorEl.style.display = "none";
+                
+                // Add login animation
+                const loginBox = document.getElementById("login-box");
+                loginBox.style.animation = "slideUp 0.8s forwards";
+                
+                setTimeout(() => {
+                    document.getElementById("login").style.display = "none";
+                    document.getElementById("content").style.display = "block";
+                    
+                    // Replace the "Your personal hub" text with a random quote
+                    document.getElementById("motivation").textContent = getRandomQuote();
+                    
+                    // Add entrance animation to content
+                    document.getElementById("content").style.animation = "fadeIn 1s ease-out";
+                }, 800);
+            } else {
+                attempts++;
+                errorEl.textContent = "Access denied!";
+                errorEl.style.display = "block";
+                errorEl.style.animation = "shake 0.5s";
+
+                if (attempts >= maxAttempts) {
+                    localStorage.setItem("bannedUntil", now + banTime);
+                    errorEl.textContent = "Too many wrong attempts. You are banned for 10 minutes.";
+                    submitBtn.disabled = true;
+                    attempts = 0;
+                    
+                    // Re-enable button after ban time
+                    setTimeout(() => {
+                        submitBtn.disabled = false;
+                        errorEl.style.display = "none";
+                    }, banTime);
+                }
+            }
         }
-      }
+        
+        // Initialize particles
+        createParticles();
+        
+        // Add enter key support
+        document.getElementById("passwordInput").addEventListener("keyup", function(event) {
+            if (event.key === "Enter") {
+                authenticate();
+            }
+        });
     </script>
-  </body>
+</body>
 </html>

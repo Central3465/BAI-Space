@@ -1,316 +1,533 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BAI Space</title>
-    <link rel="stylesheet" href="style.css" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>BAI Space - Notes</title>
     <style>
-      /* Login box */
-      button:disabled {
-        background-color: gray;
-        cursor: not-allowed;
-      }
+        :root {
+            --primary: #4a90e2;
+            --primary-dark: #3a7bc8;
+            --secondary: #50c878;
+            --dark: #1a1a2e;
+            --darker: #0d0d1a;
+            --light: #f0f0f5;
+            --gray: #e0e0e0;
+            --text: #333;
+            --text-light: #f0f0f5;
+            --error: #e74c3c;
+            --success: #2ecc71;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --note-bg: rgba(255, 255, 255, 0.08);
+            --note-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
 
-      #login {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100vh;
-      }
+        .dark-mode {
+            --primary: #5d7cba;
+            --primary-dark: #4a6a9c;
+            --dark: #0d0d1a;
+            --darker: #0a0a12;
+            --light: #1a1a2e;
+            --gray: #2a2a40;
+            --text: #e0e0e0;
+            --text-light: #f0f0f5;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --note-bg: rgba(10, 10, 18, 0.6);
+            --note-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
 
-      #login-box {
-        background: #fff;
-        padding: 30px 40px;
-        border: 2px solid #4a90e2;
-        border-radius: 15px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        text-align: center;
-        max-width: 400px;
-        width: 100%;
-      }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-      #login-box h2 {
-        margin-bottom: 15px;
-        color: #222;
-      }
+        body {
+            background: linear-gradient(135deg, var(--darker), var(--dark));
+            color: var(--text);
+            min-height: 100vh;
+            transition: var(--transition);
+            overflow-x: hidden;
+            padding: 20px;
+        }
 
-      #login-box p {
-        margin-bottom: 20px;
-        font-size: 0.95rem;
-        color: #555;
-      }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
-      #login-box input {
-        width: 100%;
-        padding: 10px;
-        margin: 8px 0;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        font-size: 1rem;
-      }
+        /* Header & Theme Toggle */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
 
-      #login-box button {
-        width: 100%;
-        margin-top: 10px;
-      }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
 
-      #content {
-        display: none; /* Hide content until login */
-        padding: 20px;
-      }
+        .logo i {
+            font-size: 2.5rem;
+            color: var(--primary);
+            animation: pulse 2s infinite;
+        }
 
-      #error {
-        color: red;
-        display: none;
-      }
+        .logo h1 {
+            font-size: 2.2rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 700;
+        }
 
-      /* Notes section styling */
-      #notes {
-        margin-top: 30px;
-        padding: 20px;
-        background: #f9f9f9;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        max-width: 600px;
-      }
+        .theme-toggle {
+            background: var(--gray);
+            border: none;
+            width: 60px;
+            height: 30px;
+            border-radius: 15px;
+            position: relative;
+            cursor: pointer;
+            transition: var(--transition);
+        }
 
-      #notes h2 {
-        margin-bottom: 15px;
-        font-size: 1.4rem;
-        color: #333;
-        text-align: center;
-      }
+        .theme-toggle::before {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--dark);
+            top: 3px;
+            left: 3px;
+            transition: var(--transition);
+        }
 
-      /* Input area */
-      #noteInput {
-        width: 100%;
-        min-height: 100px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        padding: 10px;
-        font-size: 1rem;
-        font-family: "Segoe UI", Tahoma, sans-serif;
-        resize: vertical;
-        box-sizing: border-box;
-      }
+        .dark-mode .theme-toggle {
+            background: #3a3a5a;
+        }
 
-      /* Buttons */
-      #notes button {
-        margin-top: 10px;
-        margin-right: 10px;
-        padding: 8px 14px;
-        border: none;
-        border-radius: 6px;
-        background: #4a90e2;
-        color: white;
-        font-size: 0.9rem;
-        cursor: pointer;
-        transition: background 0.2s;
-      }
+        .dark-mode .theme-toggle::before {
+            background: var(--light);
+            transform: translateX(30px);
+        }
 
-      #notes button:hover {
-        background: #357abd;
-      }
+        /* Navigation */
+        nav {
+            margin: 30px 0;
+        }
 
-      #notes button:disabled {
-        background: gray;
-        cursor: not-allowed;
-      }
+        nav ul {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            list-style: none;
+        }
 
-      /* Notes list */
-      #notesList {
-        margin-top: 20px;
-        list-style: none;
-        padding: 0;
-      }
+        nav a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 25px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-light);
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
 
-      #notesList li {
-        background: #fffbe6;
-        border: 1px solid #f0e68c;
-        border-radius: 8px;
-        padding: 10px 14px;
-        margin-bottom: 10px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
+        nav a:hover {
+            background: rgba(74, 144, 226, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
 
-      /* Delete button inside notes */
-      #notesList li button {
-        background: #ff4d4d;
-        color: white;
-        border: none;
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-size: 0.8rem;
-        cursor: pointer;
-        transition: background 0.2s;
-      }
+        nav a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            z-index: -1;
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.6s ease-in-out;
+        }
 
-      #notesList li button:hover {
-        background: #cc0000;
-      }
+        nav a:hover::before {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        /* Notes Section */
+        .notes-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 20px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .section-header h2 {
+            font-size: 2rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .section-header p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        /* Note Input Area */
+        .note-input-container {
+            background: var(--note-bg);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        #noteInput {
+            width: 100%;
+            height: 150px;
+            background: rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            color: var(--text-light);
+            font-size: 1.1rem;
+            resize: vertical;
+            transition: var(--transition);
+            margin-bottom: 15px;
+        }
+
+        #noteInput:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+        }
+
+        .note-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-save {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .btn-clear {
+            background: rgba(231, 76, 60, 0.2);
+            color: var(--error);
+            border: 1px solid rgba(231, 76, 60, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        /* Notes List */
+        #notesList {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            list-style: none;
+        }
+
+        .note-item {
+            background: var(--note-bg);
+            border-radius: 15px;
+            padding: 20px;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--note-shadow);
+            transition: var(--transition);
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .note-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .note-content {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            word-break: break-word;
+        }
+
+        .note-actions-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .note-date {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .delete-btn {
+            background: rgba(231, 76, 60, 0.2);
+            color: var(--error);
+            border: 1px solid rgba(231, 76, 60, 0.3);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .delete-btn:hover {
+            background: rgba(231, 76, 60, 0.3);
+            transform: scale(1.1);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .note-actions {
+                flex-direction: column;
+            }
+            
+            #notesList {
+                grid-template-columns: 1fr;
+            }
+            
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
     </style>
-  </head>
-  <body>
-    <div id="login">
-      <div id="login-box">
-        <h2>Enter Access Code</h2>
-        <p>
-          Access is heavily restricted. To get access, you must obtain the code
-          from the website operator.
-        </p>
-        <input type="password" id="passwordInput" placeholder="Access code" />
-        <br />
-        <button id="submitBtn" onclick="authenticate()">Submit</button>
-        <p id="error" style="color: red; display: none"></p>
-      </div>
-    </div>
-
-    <div id="content" style="display: none">
-      <header>
-        <h1>Welcome to BAI Space</h1>
-        <p id="motivation">Your personal hub</p>
-      </header>
-      <nav>
-        <ul>
-          <li><a href="notes.html">Notes</a></li>
-          <li><a href="notes/">Quick Links</a></li>
-          <li><a href="projects/">Focus Timer</a></li>
-          <li><a href="music/">To-Do Tasks</a></li>
-        </ul>
-      </nav>
-      <main>
-        <section>
-          <h2>Notes</h2>
-          <p>Write your most important notes here, so that you don't forget!</p>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-rocket"></i>
+                <h1>BAI Space</h1>
+            </div>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <i class="fas fa-moon"></i>
+            </button>
+        </header>
+        
+        <nav>
+            <ul>
+                <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="notes.html"><i class="fas fa-sticky-note"></i> Notes</a></li>
+                <li><a href="#"><i class="fas fa-link"></i> Quick Links</a></li>
+                <li><a href="#"><i class="fas fa-clock"></i> Focus Timer</a></li>
+                <li><a href="#"><i class="fas fa-tasks"></i> To-Do Tasks</a></li>
+            </ul>
+        </nav>
+        
+        <section class="notes-section">
+            <div class="section-header">
+                <div>
+                    <h2>Notes</h2>
+                    <p>Write your most important notes here, so that you don't forget!</p>
+                </div>
+            </div>
+            
+            <div class="note-input-container">
+                <textarea 
+                    id="noteInput" 
+                    placeholder="Write your note here..."></textarea>
+                <div class="note-actions">
+                    <button class="btn btn-clear" onclick="clearNotes()">
+                        <i class="fas fa-trash-alt"></i> Clear All
+                    </button>
+                    <button class="btn btn-save" onclick="saveNote()">
+                        <i class="fas fa-save"></i> Save Note
+                    </button>
+                </div>
+            </div>
+            
+            <ul id="notesList"></ul>
         </section>
-      </main>
-
-      <!-- Notes live here so they stay hidden until login -->
-      <section id="notes">
-        <h2>Notes</h2>
-        <textarea
-          id="noteInput"
-          placeholder="Write your note here..."
-        ></textarea>
-        <br />
-        <button onclick="saveNote()">Save Note</button>
-        <button onclick="clearNotes()">Clear All Notes</button>
-        <ul id="notesList"></ul>
-      </section>
     </div>
 
     <script>
-      function saveNote() {
-        const input = document.getElementById("noteInput");
-        const note = input.value.trim();
-        if (note) {
-          let notes = JSON.parse(localStorage.getItem("notes")) || [];
-          notes.push(note);
-          localStorage.setItem("notes", JSON.stringify(notes));
-          input.value = "";
-          renderNotes();
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        
+        // Check for saved theme preference or respect OS preference
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+            body.classList.add('dark-mode');
         }
-      }
+        
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            
+            // Save preference to localStorage
+            if (body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+            } else {
+                localStorage.setItem('theme', 'light');
+            }
+        });
+        
+        // Notes functionality
+        function saveNote() {
+            const input = document.getElementById("noteInput");
+            const note = input.value.trim();
+            if (note) {
+                let notes = JSON.parse(localStorage.getItem("notes")) || [];
+                notes.push({
+                    id: Date.now(),
+                    content: note,
+                    date: new Date().toLocaleString()
+                });
+                localStorage.setItem("notes", JSON.stringify(notes));
+                input.value = "";
+                renderNotes();
+            }
+        }
 
-      function clearNotes() {
-        localStorage.removeItem("notes");
-        renderNotes();
-      }
+        function clearNotes() {
+            if (confirm("Are you sure you want to delete all notes? This cannot be undone.")) {
+                localStorage.removeItem("notes");
+                renderNotes();
+            }
+        }
 
-      function renderNotes() {
-        const notesList = document.getElementById("notesList");
-        notesList.innerHTML = "";
-        const notes = JSON.parse(localStorage.getItem("notes")) || [];
-        notes.forEach((note, index) => {
-          const li = document.createElement("li");
-          li.textContent = note;
-
-          // Delete button for each note
-          const delBtn = document.createElement("button");
-          delBtn.textContent = "❌";
-          delBtn.style.marginLeft = "10px";
-          delBtn.onclick = () => {
-            notes.splice(index, 1);
+        function deleteNote(id) {
+            let notes = JSON.parse(localStorage.getItem("notes")) || [];
+            notes = notes.filter(note => note.id !== id);
             localStorage.setItem("notes", JSON.stringify(notes));
             renderNotes();
-          };
+        }
 
-          li.appendChild(delBtn);
-          notesList.appendChild(li);
+        function renderNotes() {
+            const notesList = document.getElementById("notesList");
+            notesList.innerHTML = "";
+            const notes = JSON.parse(localStorage.getItem("notes")) || [];
+            
+            if (notes.length === 0) {
+                notesList.innerHTML = "<p style='text-align: center; color: var(--text-light); grid-column: 1 / -1; padding: 40px;'>No notes yet. Add your first note above!</p>";
+                return;
+            }
+            
+            // Reverse to show newest first
+            notes.reverse().forEach(note => {
+                const li = document.createElement("li");
+                li.className = "note-item";
+                
+                li.innerHTML = `
+                    <div class="note-content">${note.content}</div>
+                    <div class="note-actions-bottom">
+                        <div class="note-date">${note.date}</div>
+                        <div class="delete-btn" onclick="deleteNote(${note.id})">
+                            <i class="fas fa-times"></i>
+                        </div>
+                    </div>
+                `;
+                
+                notesList.appendChild(li);
+            });
+        }
+
+        // Load notes on page load
+        renderNotes();
+        
+        // Add enter key support for saving notes (with Shift+Enter for new line)
+        document.getElementById("noteInput").addEventListener("keydown", function(event) {
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                saveNote();
+            }
         });
-      }
-
-      // Load notes on page load
-      renderNotes();
     </script>
-
-    <script>
-      let attempts = 0;
-      const maxAttempts = 3;
-      const banTime = 3000; //10 * 60 * 1000; // 10 minutes in ms
-
-      // Add your motivational quotes here
-      const quotes = [
-        "Stay focused. Stay determined.",
-        "Small steps every day add up to big results.",
-        "Your only limit is your imagination.",
-        "Dream it. Do it.",
-        "Discipline beats motivation.",
-        "Don’t wish for it. Work for it.",
-        "Progress, not perfection.",
-      ];
-
-      function getRandomQuote() {
-        const index = Math.floor(Math.random() * quotes.length);
-        return quotes[index];
-      }
-
-      function authenticate() {
-        const now = Date.now();
-        const bannedUntil = localStorage.getItem("bannedUntil");
-        const errorEl = document.getElementById("error");
-        const submitBtn = document.getElementById("submitBtn");
-        const inputEl = document.getElementById("passwordInput");
-
-        // Always clear input after pressing submit
-        const input = inputEl.value;
-        inputEl.value = "";
-
-        if (bannedUntil && now < parseInt(bannedUntil)) {
-          const remaining = Math.ceil((parseInt(bannedUntil) - now) / 1000);
-          errorEl.textContent = `Too many wrong attempts. Try again in ${remaining} seconds.`;
-          errorEl.style.display = "block";
-          submitBtn.disabled = true;
-          return;
-        }
-
-        if (input === "HanlinSecret123") {
-          localStorage.removeItem("bannedUntil");
-          errorEl.style.display = "none";
-          document.getElementById("login").style.display = "none";
-          document.getElementById("content").style.display = "block";
-
-          // Replace the "Your personal hub" text with a random quote
-          document.getElementById("motivation").textContent = getRandomQuote();
-        } else {
-          attempts++;
-          errorEl.textContent = "Access denied!";
-          errorEl.style.display = "block";
-
-          if (attempts >= maxAttempts) {
-            localStorage.setItem("bannedUntil", now + banTime);
-            errorEl.textContent =
-              "Too many wrong attempts. You are banned for 10 minutes.";
-            submitBtn.disabled = true;
-            attempts = 0;
-          }
-        }
-      }
-    </script>
-  </body>
+</body>
 </html>
